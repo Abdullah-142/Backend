@@ -4,12 +4,12 @@ import connectDb from './database/index.js';
 const app = express();
 
 
-connectDb();
-
-app.get('/', (req, res) => {
-  res.json({ message: 'Welcome to the express-mongo API' });
+connectDb().then(() => {
+  app.listen(3000, () => {
+    console.log('Server is running on port 3000');
+  });
 })
-
-app.listen(3000, () => {
-  console.log('Server is running on port 3000');
-})
+  .catch((error) => {
+    console.log('Error connecting to the database', error);
+    process.exit(1);
+  });
