@@ -1,7 +1,6 @@
-import express from 'express';
 import connectDb from './database/index.js';
 
-const app = express();
+import { app } from './app.js';
 
 
 connectDb().then(() => {
@@ -13,3 +12,4 @@ connectDb().then(() => {
     console.log('Error connecting to the database', error);
     process.exit(1);
   });
+

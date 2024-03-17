@@ -52,7 +52,31 @@ userSchema.methods.isPasswordCorrect = async function (password) {
   return await becrypt.compare(password, this.password);
 };
 
+userSchema.methods.createAccessToken = function () {
+  return jwt.sign(
+    {
+      userId: this._id, email: this.email,
+      username: this.username
+    },
+    process.env.ACCESS_TOKEN_SECRET,
+    {
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRY
+    }
+  );
+};
 
+userSchema.methods.createRefreshToken = function () {
+  return jwt.sign(
+    {
+      userId: this._id
+    }
+    ,
+    process.env.REFRESH_TOKEN_SECRET,
+    {
+      expiresIn: process.env.REFRESH_TOKEN_EXPIRY
+    }
+  );
 
+}
 
 export const User = Mongoose.model('User', userSchema);
