@@ -48,4 +48,11 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-const User = Mongoose.model('User', userSchema);
+userSchema.methods.isPasswordCorrect = async function (password) {
+  return await becrypt.compare(password, this.password);
+};
+
+
+
+
+export const User = Mongoose.model('User', userSchema);
