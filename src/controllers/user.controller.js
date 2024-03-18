@@ -40,10 +40,10 @@ const registerHandler = asyncHandler(async (req, res, next) => {
   const createUser = await User.create({
     fullname,
     email,
+    backgroundImage: uploadCoverPath?.url || "",
     password,
     username: username.toLowerCase(),
     avatar: uploadAvatarPath.url,
-    backgroundImage: uploadCoverPath?.url || "",
   })
 
   const checkUser = await User.findOne(
