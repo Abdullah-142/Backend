@@ -1,4 +1,4 @@
-import { Mongoose } from "mongoose";
+import { mongoose } from "mongoose";
 import { Schema } from "mongoose";
 import becrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -33,7 +33,14 @@ const userSchema = new Schema({
   },
   backgroundImage: {
     type: String,
+    
   },
+  watchHistory: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'Video'
+    }
+  ],
   refreshToken: {
     type: String,
   },
@@ -79,4 +86,4 @@ userSchema.methods.createRefreshToken = function () {
 
 }
 
-export const User = Mongoose.model('User', userSchema);
+export const User = mongoose.model('User', userSchema);

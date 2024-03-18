@@ -11,8 +11,9 @@ const uploadImage = async (filePath) => {
     if (!filePath) return null;
     const response = await cloudinary.uploader.upload(filePath, {
       resource_type: "auto",
+      folder: "chai-backend",
     });
-    console.log("upload Successfully ", response.secure_url);
+    fs.unlinkSync(filePath);
     return response;
   } catch (err) {
     fs.unlinkSync(filePath);
