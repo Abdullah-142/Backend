@@ -20,9 +20,9 @@ const registerHandler = asyncHandler(async (req, res, next) => {
 
   const tempFilePath = req.files?.avatar[0]?.path
 
-  let coverImagePath;
+  let tempCoverPath;
   if (req.files && Array.isArray(req.files.backgroundImage) && req.files.backgroundImage.length > 0) {
-    coverImagePath = req.files.backgroundImage[0].path;
+    tempCoverPath = req.files.backgroundImage[0].path;
   }
 
 
@@ -31,7 +31,7 @@ const registerHandler = asyncHandler(async (req, res, next) => {
   }
 
   const uploadAvatarPath = await uploadImage(tempFilePath);
-  const uploadCoverPath = await uploadImage(coverImagePath);
+  const uploadCoverPath = await uploadImage(tempCoverPath);
 
   if (!uploadAvatarPath) {
     throw new ApiError(500, 'Image upload failed');
