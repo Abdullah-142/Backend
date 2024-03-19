@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { registerHandler, logoutHandler } from '../controllers/user.controller.js';
+import { registerHandler, logoutHandler, loginHandler } from '../controllers/user.controller.js';
 import { upload } from '../middlewares/multer.middleware.js';
-import { verifyJwt } from '../middlewares/auth.middleware.js';
+import { verifyJWT } from '../middlewares/auth.middleware.js';
 const router = Router();
 
 
@@ -16,9 +16,11 @@ router.route('/register').post(upload.fields([
   }
 ]), registerHandler);
 
+router.route('/login').post(loginHandler);
+
 // secured routes
 
-router.route('/logout').post(verifyJwt, logoutHandler);
+router.route('/logout').post(verifyJWT, logoutHandler);
 
 
 export { router }
