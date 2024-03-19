@@ -33,7 +33,7 @@ const userSchema = new Schema({
   },
   backgroundImage: {
     type: String,
-    
+
   },
   watchHistory: [
     {
@@ -62,7 +62,8 @@ userSchema.methods.isPasswordCorrect = async function (password) {
 userSchema.methods.createAccessToken = function () {
   return jwt.sign(
     {
-      userId: this._id, email: this.email,
+      userId: this._id,
+      email: this.email,
       username: this.username
     },
     process.env.ACCESS_TOKEN_SECRET,
