@@ -83,7 +83,7 @@ const registerHandler = asyncHandler(async (req, res, next) => {
 
 //Login handler
 
-const loginHandler = asyncHandler(async (req, res, next) => {
+const loginHandler = asyncHandler(async (req, res) => {
   const { email, password, username } = req.body;
 
   if (!(email && password && username)) {
