@@ -55,6 +55,8 @@ const registerHandler = asyncHandler(async (req, res, next) => {
   if (!tempFilePath) {
     throw new ApiError(400, 'There is no image file');
   }
+
+  
   const uploadAvatarPath = await uploadImage(tempFilePath);
   const uploadCoverPath = await uploadImage(tempCoverPath);
 
