@@ -86,7 +86,6 @@ const registerHandler = asyncHandler(async (req, res, next) => {
 const loginHandler = asyncHandler(async (req, res) => {
 
   const { email, username, password } = req.body
-  console.log(email);
 
   if (!(username || email)) {
     throw new ApiError(400, "username or email is required")
@@ -173,9 +172,7 @@ const refreshTokenHandler = asyncHandler(async (req, res) => {
   try {
     const decodeToken = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET)
 
-    console.log(decodeToken);
-
-    const user = await User.findById(decodeToken.userId)
+    const user = await User.findById(decodeToken._id).select("-password")
 
     if (!user) {
       throw new ApiError(404, "User not found")
@@ -187,11 +184,17 @@ const refreshTokenHandler = asyncHandler(async (req, res) => {
 
     const { accessToken, refreshToken: newRefreshToken } = await generateAccessAndRefereshTokens(user._id)
 
-    res.status(200).json(
-      new ApiResponse(200, {
-        accessToken, refreshToken: newRefreshToken
-      })
-    )
+    const options = {
+      httpOnly: true,
+      secure: true
+    }
+
+    res.status(200).cookie("accessToken", accessToken, options).cookie("refreshToken", newRefreshToken, options)
+      .json(
+        new ApiResponse(200, {
+          accessToken, refreshToken: newRefreshToken
+        })
+      )
   } catch (error) {
     throw new ApiError(401, error.message || "User not authenticated")
   }
