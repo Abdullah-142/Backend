@@ -25,6 +25,7 @@ const generateAccessAndRefereshTokens = async (userid) => {
   }
 }
 
+// Reister handler
 
 const registerHandler = asyncHandler(async (req, res, next) => {
   const { fullname, email, password, username } = req.body;
@@ -159,7 +160,6 @@ const logoutHandler = asyncHandler(async (req, res) => {
 })
 
 
-
 // generateRefreshToken
 
 const refreshTokenHandler = asyncHandler(async (req, res) => {
@@ -200,4 +200,150 @@ const refreshTokenHandler = asyncHandler(async (req, res) => {
   }
 })
 
-export { registerHandler, loginHandler, logoutHandler, refreshTokenHandler }
+
+// update password 
+
+
+const updatepasswordhanlder = asyncHandler(async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+
+  if (!oldPassword || !newPassword) {
+    throw new ApiError(400, "Old password and new password are required")
+  }
+
+  const user = await User.findById(req.user._id).select("-password")
+
+  const isPasswordValid = await user.isPasswordCorrect(oldPassword)
+
+  if (!isPasswordValid) {
+    throw new ApiError(401, "Invalid user credentials")
+  }
+
+  user.password = newPassword;
+
+
+  await user.save({
+    validateBeforeSave: false
+  })
+
+  res.status(200).json(new ApiResponse(200, {}, "Password updated successfully"))
+})
+
+//getcurrntnuser
+
+
+const getCurrentUser = asyncHandler(async (req, res) => {
+  res.status(200)
+    .json
+    (
+      new ApiResponse
+        (
+          200, req.user, "User found"
+        )
+    )
+
+})
+
+//update user profile
+
+const updateUserProfile = asyncHandler(async (req, res) => {
+  const { fullname, username, email } = req.body;
+
+  const user = await User.findByIdAndUpdate(req.user._id, {
+    $set: {
+      fullname,
+      username,
+      email
+    }
+  }, // Add this comma
+    {
+      new: true
+    }
+  ).select("-password")
+
+  if (!user) {
+    throw new ApiError(404, "There was an error updating user profile")
+  }
+
+  res.status(200).json(new ApiResponse(200, {}, "User updated successfully"))
+})
+
+//updateAvatar
+
+const updateAvatar = asyncHandler(async (req, res) => {
+  const avatarLocalPath = req.file.path;
+
+  if (!avatarLocalPath) {
+    throw new ApiError(400, "Avatar is required")
+  }
+
+
+  const avatar = await uploadImage(avatarLocalPath);
+
+  if (!avatar) {
+    throw new ApiError(500, "Image upload failed")
+  }
+
+  const user = await User.findByIdAndUpdate(req.user._id, {
+    $set: {
+      avatar: avatar.url
+    }
+  }, {
+    new: true
+  }).select("-password")
+
+  if (!user) {
+    throw new ApiError(404, "There was an error updating user avatar")
+  }
+
+  res.status(200).json(new ApiResponse(200, {}, "User avatar updated successfully"))
+
+
+})
+
+
+//updatecpverimage
+
+const updateCoverImage = asyncHandler(async (req, res) => {
+  const coverImageLocalPath = req.file.path;
+
+  if (!coverImageLocalPath) {
+    throw new ApiError(400, "Avatar is required")
+  }
+
+
+  const coverImage = await uploadImage(coverImageLocalPath);
+
+  if (!coverImage) {
+    throw new ApiError(500, "Image upload failed")
+  }
+
+  const user = await User.findByIdAndUpdate(req.user._id, {
+    $set: {
+      avatar: coverImage.url
+    }
+  }, {
+    new: true
+  }).select("-password")
+
+  if (!user) {
+    throw new ApiError(404, "There was an error updating user coverImage")
+  }
+
+  res.status(200).json(new ApiResponse(200, {}, "User coverImage updated successfully"))
+
+
+})
+
+
+export {
+  registerHandler,
+  loginHandler,
+  logoutHandler,
+  refreshTokenHandler,
+  updatepasswordhanlder,
+  getCurrentUser,
+  updateUserProfile,
+  updateAvatar,
+  updateCoverImage
+}
