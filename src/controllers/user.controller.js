@@ -5,6 +5,9 @@ import uploadImage from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import jwt from "jsonwebtoken";
 
+
+// Generate access and refresh tokens
+
 const generateAccessAndRefereshTokens = async (userid) => {
   try {
     const user = await User.findOne(userid);
