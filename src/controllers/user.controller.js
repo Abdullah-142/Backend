@@ -134,6 +134,8 @@ const loginHandler = asyncHandler(async (req, res) => {
     )
 
 })
+
+
 // logoutHandler
 
 const logoutHandler = asyncHandler(async (req, res) => {
@@ -207,14 +209,14 @@ const refreshTokenHandler = asyncHandler(async (req, res) => {
 // update password 
 
 
-const updatepasswordhanlder = asyncHandler(async (req, res) => {
+const updatepasswordHanlder = asyncHandler(async (req, res) => {
   const { oldPassword, newPassword } = req.body;
 
   if (!oldPassword || !newPassword) {
     throw new ApiError(400, "Old password and new password are required")
   }
 
-  const user = await User.findById(req.user._id).select("-password")
+  const user = await User.findById(req.user._id)
 
   const isPasswordValid = await user.isPasswordCorrect(oldPassword)
 
@@ -252,7 +254,13 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 const updateUserProfile = asyncHandler(async (req, res) => {
   const { fullname, username, email } = req.body;
 
-  const user = await User.findByIdAndUpdate(req.user._id, {
+
+  if (!fullname && !username && !email) {
+    // None of the fields are filled
+    return res.status(400).json({ error: 'At least one field (fullname, username, or email) must be filled.' });
+  }
+
+  const user = await User.findByIdAndUpdate(req.user?._id, {
     $set: {
       fullname,
       username,
@@ -344,7 +352,7 @@ export {
   loginHandler,
   logoutHandler,
   refreshTokenHandler,
-  updatepasswordhanlder,
+  updatepasswordHanlder,
   getCurrentUser,
   updateUserProfile,
   updateAvatar,
