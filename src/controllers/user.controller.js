@@ -56,7 +56,7 @@ const registerHandler = asyncHandler(async (req, res, next) => {
     throw new ApiError(400, 'There is no image file');
   }
 
-  
+
   const uploadAvatarPath = await uploadImage(tempFilePath);
   const uploadCoverPath = await uploadImage(tempCoverPath);
 
@@ -349,6 +349,84 @@ const updateCoverImage = asyncHandler(async (req, res) => {
 })
 
 
+const getUserProfile = asyncHandler(async (req, res) => {
+  const { username } = req.params;
+
+  if (!username?.trim()) {
+    throw new ApiError(400, "Username Not Found in params")
+  }
+
+  const channel = await User.aggregate - [
+    {
+      $match: {
+        username: username?.toLowerCase()
+      }
+    },
+    {
+      $lookup: {
+        from: "subscriptions",
+        localField: "_id",
+        foreignField: "channel",
+        as: "subscribers"
+      }
+    },
+    {
+      $lookup: {
+        from: "subscriptions",
+        localField: "_id",
+        foreignField: "subscriber",
+        as: "subscribedTo"
+      }
+    },
+    {
+      $addFields: {
+        subscriberCount: { $size: "$subscribers" },
+        subscribedToCount: { $size: "$subscribedTo" },
+        isSubscribed: {
+          $cond: {
+            if: {
+              $in: [req.user?._id, "$subscribers.subscriber"]
+            },
+            then: true,
+            else: false
+          }
+        }
+      }
+    },
+    {
+      $project: {
+        email: 1,
+        username: 1,
+        fullname: 1,
+        avatar: 1,
+        backgroundImage: 1,
+        subscriberCount: 1,
+        subscribedToCount: 1,
+        isSubscribed: 1
+      }
+    }
+  ]
+
+  if (!channel?.length) {
+    throw new ApiError(404, "Channel not found")
+  }
+
+  console.log(channel);
+
+
+  res.status(200)
+    .json
+    (
+      new ApiResponse
+        (
+          200,
+          channel[0],
+          "Channel found Successfully"
+        )
+    )
+})
+
+
 export {
   registerHandler,
   loginHandler,
@@ -358,5 +436,6 @@ export {
   getCurrentUser,
   updateUserProfile,
   updateAvatar,
-  updateCoverImage
+  updateCoverImage,
+  getUserProfile
 }
