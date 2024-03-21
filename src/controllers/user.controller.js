@@ -421,7 +421,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
         (
           200,
           channel[0],
-          "Total subscribe Channel Found "
+          "Total subscribe Channel Found"
         )
     )
 })
