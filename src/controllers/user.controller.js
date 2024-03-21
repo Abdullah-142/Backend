@@ -347,6 +347,9 @@ const updateCoverImage = asyncHandler(async (req, res) => {
 
 })
 
+
+//getUserProfile
+
 const getUserProfile = asyncHandler(async (req, res) => {
   const { username } = req.params;
 
@@ -424,6 +427,73 @@ const getUserProfile = asyncHandler(async (req, res) => {
     )
 })
 
+// in aggregate your resquest goes direct to the database and you can use the $match to filter the data you want to get from the database. In this case, you are filtering the data by the username and then you are using the $lookup to get the subscribers and subscribedTo from the subscriptions collection. Then you are using the $addFields to add the subscriberCount, subscribedToCount, and isSubscribed fields to the data you are getting from the database. Then you are using the $project to select the fields you want to return in the response. your libray mongoose is not used.
+
+
+//getUserWatchHistory
+
+
+const getUserWatchHistory = asyncHandler(async (req, res) => {
+  const user = await User.aggregate([
+    {
+      $match: {
+        _id: new mongoose.Types.ObjectId(req.user._id)
+      }
+    },
+    {
+      $lookup: {
+        from: "videos",
+        localField: "watchHistory",
+        foreignField: "_id",
+        as: "watchHistory",
+        pipeline: [
+          {
+            $lookup:
+            {
+              from: "users",
+              localField: "owner",
+              foreignField: "_id",
+              as: "owner",
+              pipeline: [
+                {
+                  $project: {
+                    avatar: 1,
+                    title: 1,
+                    description: 1,
+
+                  }
+                },
+              ]
+            }
+          },
+
+          {
+            $addFields: {
+              owner: {
+                $first: "$owner"
+              }
+            }
+          }
+        ]
+      }
+    },
+  ])
+
+  if (!user?.length) {
+    throw new ApiError(404, "User not found")
+  }
+
+  res.status(200)
+    .json
+    (
+      new ApiResponse
+        (
+          200,
+          user[0].watchHistory,
+          "User watch history found"
+        )
+    )
+})
 
 export {
   registerHandler,
@@ -435,5 +505,6 @@ export {
   updateUserProfile,
   updateAvatar,
   updateCoverImage,
-  getUserProfile
+  getUserProfile,
+  getUserWatchHistory
 }
