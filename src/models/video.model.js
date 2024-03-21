@@ -13,7 +13,7 @@ const videoSchema = new Schema({
     required: true,
   },
   owner: {
-    type: Mongoose.Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
   },
   title: {

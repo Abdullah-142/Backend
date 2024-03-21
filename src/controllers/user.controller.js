@@ -314,7 +314,6 @@ const updateAvatar = asyncHandler(async (req, res) => {
 
 })
 
-
 //updatecoverimage
 
 const updateCoverImage = asyncHandler(async (req, res) => {
@@ -347,7 +346,6 @@ const updateCoverImage = asyncHandler(async (req, res) => {
 
 
 })
-
 
 const getUserProfile = asyncHandler(async (req, res) => {
   const { username } = req.params;
