@@ -315,7 +315,7 @@ const updateAvatar = asyncHandler(async (req, res) => {
 })
 
 
-//updatecpverimage
+//updatecoverimage
 
 const updateCoverImage = asyncHandler(async (req, res) => {
   const coverImageLocalPath = req.file.path;
