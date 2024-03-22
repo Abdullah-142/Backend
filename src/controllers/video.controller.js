@@ -132,9 +132,11 @@ const updateVideoDes = asyncHandler(async (req, res) => {
 
 const updatethumbnailPath = asyncHandler(async (req, res) => {
 
-  const { videoId } = req.file
+  const { videoId } = req.params
 
   const { _id } = req.user
+
+  const video = await Video.findById(videoId)
 
   //only owner can update the video 
   const user = await User.findById(_id)
@@ -143,20 +145,27 @@ const updatethumbnailPath = asyncHandler(async (req, res) => {
     throw new ApiError(404, "User not found")
   }
 
-  if (req.refreshToken !== user.refreshToken) {
+  if (!video) {
+    throw new ApiError(404, "video not found")
+  }
+
+  
+  if (!video.owner.toString() === user._id.toString()) {
     throw new ApiError(401, "only owner can update the video")
   }
 
-  const thumbnailPathFilPath = req.file.thumbnailPath[0].path
+  const thumbnailPathFilPath = req.file.thumbnail[0].path
+
+  console.log(thumbnailPathFilPath);
 
   if (!thumbnailPathFilPath) {
-    throw new ApiError(400, "Video file is required")
+    throw new ApiError(400, "thumbnail file is required")
   }
 
   const thumbnailUrl = await uploadOnCloudinary(thumbnailPath)
 
   if (!thumbnailUrl) {
-    throw new ApiError(500, "Failed to upload video or thumbnail")
+    throw new ApiError(500, "Failed to update thumbnail")
   }
 
   const updateThumbnail = await Video.findByIdAndUpdate(videoId, {
@@ -168,11 +177,11 @@ const updatethumbnailPath = asyncHandler(async (req, res) => {
   })
 
   if (!updateThumbnail) {
-    throw new ApiError(500, "Failed to update video")
+    throw new ApiError(500, "Failed to update thumbnail")
   }
 
   res.status(200).json(
-    new ApiResponse(200, updateThumbnail, "Video updated successfully")
+    new ApiResponse(200, updateThumbnail, "thumbnail updated successfully")
   )
 
 })

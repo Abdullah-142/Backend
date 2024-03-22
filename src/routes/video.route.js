@@ -5,6 +5,7 @@ import {
   publishAVideo,
   getVideoById,
   deleteVideo,
+  updatethumbnailPath,
   toggleVideoStatus,
   updateVideoDes
 } from "../controllers/video.controller.js";
@@ -32,6 +33,8 @@ videoRouter.route("/publish-video").post(upload.fields([
 videoRouter.route("/:videoId").get(getVideoById)
 
 videoRouter.route("/update-video/:videoId").post(updateVideoDes)
+
+videoRouter.route("/update-thumbnail/:videoId").patch(upload.single("thumbnail"), updatethumbnailPath)
 
 videoRouter.route("/:videoId").delete(deleteVideo)
 
