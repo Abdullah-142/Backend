@@ -105,7 +105,7 @@ const updateVideoDes = asyncHandler(async (req, res) => {
   }
   console.log(user._id, video.owner);
 
-  if (!video.owner.equals(user._id)) {
+  if (!video.owner.toString() === user._id.toString()) {
     throw new ApiError(401, "only owner can update the video")
   }
 
