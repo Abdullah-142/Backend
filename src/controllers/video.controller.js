@@ -221,12 +221,15 @@ const deleteVideo = asyncHandler(async (req, res) => {
 
 const toggleVideoStatus = asyncHandler(async (req, res) => {
   const { videoId } = req.params
+
   if (!videoId) {
     throw new ApiError(400, "Video ID is required")
   }
 
   const video = await Video.findByIdAndUpdate(videoId, {
-    isPublic: !video.isPublic
+    $set: {
+      isPublic: !video.isPublic
+    }
   }, { new: true })
 
   if (!video) {
@@ -234,7 +237,7 @@ const toggleVideoStatus = asyncHandler(async (req, res) => {
   }
 
   res.status(200).json(
-    new ApiResponse(200, video, "Video status updated successfully")
+    new ApiResponse(200, {}, "Video status updated successfully")
   )
 
 })
