@@ -29,7 +29,6 @@ router.route('/register').post(upload.fields([
 ]), registerHandler);
 
 router.route('/login').post(loginHandler);
-
 // secured routes
 
 router.route('/logout').post(verifyJWT, logoutHandler);
