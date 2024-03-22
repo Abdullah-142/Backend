@@ -72,7 +72,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
     );
 
     if (videos.length === 0) {
-        return res.status(200).json(new ApiResponse(200, "No videos available."));
+        return res.status(200).json(new ApiResponse(400, "No videos available."));
     }
 
     // Return the videos
