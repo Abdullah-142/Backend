@@ -8,9 +8,76 @@ import uploadOnCloudinary from "../utils/cloudinary.js"
 
 
 const getAllVideos = asyncHandler(async (req, res) => {
-  const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
+    const { page = 1, limit = 10, query, sortBy, sortType} = req.query;
 
-})
+    const user = await User.find({
+        refreshToken: req.cookies.refreshToken,
+    });
+
+    const pageNumber = parseInt(page);
+    const limitOfComments = parseInt(limit);
+
+    if (!user) {
+        throw new ApiError(400, "User is required.");
+    }
+
+    const skip = (pageNumber - 1) * limitOfComments;
+    const pageSize = limitOfComments;
+
+    const videos = await Video.aggregatePaginate(
+        Video.aggregate([
+            { 
+                $match: {
+                    $or: [
+                        { title: { $regex: query, $options: 'i' } },
+                        { description: { $regex: query, $options: 'i' } }
+                    ],
+                    isPublished: true,
+                    owner: user._id
+                }
+            },
+            {
+                $lookup: {
+                    from: "likes",
+                    localField: "_id",
+                    foreignField: "video",
+                    as: "likes",
+                }
+            },
+            {
+                $addFields: {
+                    likes: { $size: "$likes" }
+                }
+            },
+            {
+                $project: {
+                    "_id": 1,
+                    "videoFile": 1,
+                    "thumbnail": 1,
+                    "title": 1,
+                    "description": 1,
+                    "duration": 1,
+                    "views": 1,
+                    "isPublished": 1,
+                    "owner": 1,
+                    "createdAt": 1,
+                    "updatedAt": 1,
+                    "likes": 1
+                }
+            },
+            { $sort: { [sortBy]: sortType === 'asc' ? 1 : -1 } },
+            { $skip: skip },
+            { $limit: pageSize }
+        ])
+    );
+
+    if (videos.length === 0) {
+        return res.status(200).json(new ApiResponse(200, "No videos available."));
+    }
+
+    // Return the videos
+    res.status(200).json(new ApiResponse(200, videos, "Videos fetched successfully"));
+});
 
 const publishAVideo = asyncHandler(async (req, res) => {
   const { title, description } = req.body
