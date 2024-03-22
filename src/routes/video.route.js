@@ -34,9 +34,9 @@ videoRouter.route("/:videoId").get(getVideoById)
 
 videoRouter.route("/update-video/:videoId").post(updateVideoDes)
 
-videoRouter.route("/update-thumbnail/:videoId").post(upload.single("thumbnail"), updatethumbnailPath)
+videoRouter.route("/update-thumbnail/:videoId").patch(upload.single("thumbnail"), updatethumbnailPath)
 
-videoRouter.route("/:videoId").delete(deleteVideo)
+videoRouter.route("/d/:videoId").delete(deleteVideo)
 
 videoRouter.route("/:videoId/toggle-status").patch(toggleVideoStatus);
 

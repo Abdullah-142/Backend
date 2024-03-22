@@ -187,11 +187,27 @@ const updatethumbnailPath = asyncHandler(async (req, res) => {
 
 const deleteVideo = asyncHandler(async (req, res) => {
   const { videoId } = req.params
+  const { _id } = req.user
+
   if (!videoId) {
     throw new ApiError(400, "Video ID is required")
   }
 
+  const user = await User.findById(_id)
+
+  if (!user) {
+    throw new ApiError(404, "User not found")
+  }
   const video = await Video.findByIdAndDelete(videoId)
+
+  if (!video) {
+    throw new ApiError(404, "Video not found")
+  }
+
+  if (!user._id.toString() === video.owner.toString()) {
+    throw new ApiError(401, "only owner can delete the video")
+  }
+
 
   if (!video) {
     throw new ApiError(404, "Video not found")
