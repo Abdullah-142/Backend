@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
-import uploadImage from "../utils/cloudinary.js";
+import uploadOnCloudinary from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import jwt from "jsonwebtoken";
 
@@ -57,8 +57,8 @@ const registerHandler = asyncHandler(async (req, res, next) => {
   }
 
 
-  const uploadAvatarPath = await uploadImage(tempFilePath);
-  const uploadCoverPath = await uploadImage(tempCoverPath);
+  const uploadAvatarPath = await uploadOnCloudinary(tempFilePath);
+  const uploadCoverPath = await uploadOnCloudinary(tempCoverPath);
 
   if (!uploadAvatarPath) {
     throw new ApiError(500, 'Image upload failed');
@@ -291,7 +291,7 @@ const updateAvatar = asyncHandler(async (req, res) => {
   }
 
 
-  const avatar = await uploadImage(avatarLocalPath);
+  const avatar = await uploadOnCloudinary(avatarLocalPath);
 
   if (!avatar) {
     throw new ApiError(500, "Image upload failed")
@@ -324,7 +324,7 @@ const updateCoverImage = asyncHandler(async (req, res) => {
   }
 
 
-  const coverImage = await uploadImage(coverImageLocalPath);
+  const coverImage = await uploadOnCloudinary(coverImageLocalPath);
 
   if (!coverImage) {
     throw new ApiError(500, "Image upload failed")

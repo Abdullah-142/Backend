@@ -31,7 +31,7 @@ const videoSchema = new Schema({
   },
   duration: {
     type: String,
-    required: true,
+    // required: true,
   },
   isPublic: {
     type: Boolean,

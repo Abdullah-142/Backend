@@ -21,7 +21,15 @@ app.use(express.static('public'));
 app.use(cookieParser());
 
 import { router } from './routes/user.route.js';
+import { playlistRouter } from './routes/playlist.route.js';
+import { videoRouter } from './routes/video.route.js';
 
 app.use('/api/v1/users', router);
+
+app.use("/api/v1/playlist", playlistRouter);
+
+app.use("/api/v1/videos", videoRouter);
+
+
 
 export { app }
