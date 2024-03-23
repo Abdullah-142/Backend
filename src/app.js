@@ -1,5 +1,5 @@
-import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 import express from 'express';
 const app = express();
 
@@ -20,8 +20,8 @@ app.use(express.urlencoded({
 app.use(express.static('public'));
 app.use(cookieParser());
 
-import { router } from './routes/user.route.js';
 import { playlistRouter } from './routes/playlist.route.js';
+import { router } from './routes/user.route.js';
 import { videoRouter } from './routes/video.route.js';
 
 app.use('/api/v1/users', router);
@@ -32,4 +32,4 @@ app.use("/api/v1/videos", videoRouter);
 
 
 
-export { app }
+export { app };

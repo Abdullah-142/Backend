@@ -1,12 +1,12 @@
 import { Router } from "express";
 
 import {
-  getAllVideos,
-  publishAVideo,
-  getVideoById,
   deleteVideo,
-  updatethumbnailPath,
+  getAllVideos,
+  getVideoById,
+  publishAVideo,
   toggleVideoStatus,
+  updatethumbnailPath,
   updateVideoDes
 } from "../controllers/video.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -40,4 +40,4 @@ videoRouter.route("/d/:videoId").delete(deleteVideo)
 
 videoRouter.route("/:videoId/toggle-status").patch(toggleVideoStatus);
 
-export { videoRouter }
+export { videoRouter };

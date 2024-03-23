@@ -1,19 +1,19 @@
 import { Router } from 'express';
 import {
-  registerHandler,
-  logoutHandler,
-  loginHandler,
-  refreshTokenHandler,
   getCurrentUser,
-  updatepasswordHanlder,
-  updateUserProfile,
+  getUserProfile,
+  getUserWatchHistory,
+  loginHandler,
+  logoutHandler,
+  refreshTokenHandler,
+  registerHandler,
   updateAvatar,
   updateCoverImage,
-  getUserProfile,
-  getUserWatchHistory
+  updatepasswordHanlder,
+  updateUserProfile
 } from '../controllers/user.controller.js';
-import { upload } from '../middlewares/multer.middleware.js';
 import { verifyJWT } from '../middlewares/auth.middleware.js';
+import { upload } from '../middlewares/multer.middleware.js';
 const router = Router();
 
 
@@ -45,4 +45,4 @@ router.route('/u/:id/watch-history').get(verifyJWT, getUserWatchHistory);
 // user model is done
 
 
-export { router }
+export { router };

@@ -312,11 +312,5 @@ const toggleVideoStatus = asyncHandler(async (req, res) => {
 
 
 export {
-  getAllVideos,
-  publishAVideo,
-  getVideoById,
-  updateVideoDes,
-  updatethumbnailPath,
-  deleteVideo,
-  toggleVideoStatus
+  deleteVideo, getAllVideos, getVideoById, publishAVideo, toggleVideoStatus, updatethumbnailPath, updateVideoDes
 }

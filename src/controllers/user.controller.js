@@ -1,9 +1,9 @@
-import { asyncHandler } from "../utils/asyncHandler.js";
+import jwt from "jsonwebtoken";
 import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
-import uploadOnCloudinary from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/apiResponse.js";
-import jwt from "jsonwebtoken";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import uploadOnCloudinary from "../utils/cloudinary.js";
 
 
 // Generate access and refresh tokens
@@ -496,15 +496,9 @@ const getUserWatchHistory = asyncHandler(async (req, res) => {
 })
 
 export {
-  registerHandler,
-  loginHandler,
+  getCurrentUser, getUserProfile,
+  getUserWatchHistory, loginHandler,
   logoutHandler,
-  refreshTokenHandler,
-  updatepasswordHanlder,
-  getCurrentUser,
-  updateUserProfile,
-  updateAvatar,
-  updateCoverImage,
-  getUserProfile,
-  getUserWatchHistory
-}
+  refreshTokenHandler, registerHandler, updateAvatar,
+  updateCoverImage, updatepasswordHanlder, updateUserProfile
+};
