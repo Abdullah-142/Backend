@@ -12,7 +12,7 @@ const commentRouter = Router();
 
 commentRouter.use(verifyJWT);
 
-commentRouter.route("/").post(getVideoComments);
+commentRouter.route("/:videoId").get(getVideoComments);
 
 commentRouter.route("/add/:videoId").post(addComment);
 

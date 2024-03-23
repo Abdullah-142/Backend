@@ -2,6 +2,7 @@ import { Comment } from "../models/comment.model.js"
 import { ApiError } from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/apiResponse.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
+import mongoose from "mongoose"
 
 const getVideoComments = asyncHandler(async (req, res) => {
   //TODO: get all comments for a video
@@ -12,7 +13,9 @@ const getVideoComments = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Invalid video ID")
   }
 
-  const video = await Comment.findById(videoId)
+  const video = await Comment.find({
+    video: videoId
+  })
 
   if (!video) {
     throw new ApiError(404, "Video not found")
@@ -24,7 +27,78 @@ const getVideoComments = asyncHandler(async (req, res) => {
   const skip = (pageNumber - 1) * limitOfComments
   const pageSize = limitOfComments;
 
+  const comment = await Comment.aggregate([
+    {
+      $match: {
+        video: new mongoose.Types.ObjectId(videoId)
+      }
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "owner",
+        foreignField: "_id",
+        as: "commentOwner"
+      }
+    },
+    {
+      $lookup: {
+        from: "likes",
+        localField: "_id",
+        foreignField: "comment",
+        as: "commentLikes"
+      }
+    },
+    {
+      $addFields: {
+        commentLikesCount: {
+          $size: "$commentLikes"
+        },
+        commentOwner: {
+          $first: "$commentOwner"
+        },
+        isLiked: {
+          $cond: {
+            if: { $in: [req.user?._id, "$commentLikes.likedBy"] },
+            then: true,
+            else: false
+          }
+        }
+      }
+    },
+    {
+      $project: {
+        "content": 1,
+        "createdAt": 1,
+        "commentOwner": {
+          _id: 1,
+          username: 1,
+          profilePicture: 1
+        },
+        "commentLikesCount": 1,
+        "isLiked": 1,
+        // "_id": 1 // Include the _id field directly in the projection
+      }
+    },
+    {
+      $sort: {
+        "createdAt": -1
+      }
+    },
+    {
+      $skip: skip
+    },
+    {
+      $limit: pageSize
+    }
+  ]);
 
+
+  if (!comment) {
+    throw new ApiError(404, "No comment found")
+  }
+
+  res.status(200).json(new ApiResponse(200, comment[0], "Comments retrieved successfully"))
 
 
 })
@@ -45,7 +119,7 @@ const addComment = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Failed to add comment")
   }
 
-  res.status(201).json(new ApiResponse(201, { comment }, "Comment added successfully"))
+  res.status(201).json(new ApiResponse(201, {}, "Comment added successfully"))
 })
 
 const updateComment = asyncHandler(async (req, res) => {
