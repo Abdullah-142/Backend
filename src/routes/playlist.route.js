@@ -14,10 +14,10 @@ const playlistRouter = Router();
 playlistRouter.use(verifyJWT)
 
 playlistRouter.route("/create").post(createPlaylist)
-playlistRouter.route("/user-playlists").get(getUserPlaylists)
+playlistRouter.route("/u/:userId").get(getUserPlaylists)
 playlistRouter.route("/p/:playlistId").get(getPlaylistById)
-playlistRouter.route("/add-video/:playlistId").post(addVideoToPlaylist)
-playlistRouter.route("/remove-video/:playlistId").patch(removeVideoFromPlaylist)
-playlistRouter.route("/delete-playlist/:playlistId").delete(deletePlaylist)
+playlistRouter.route("/v/:videoId/p/:playlistId").patch(addVideoToPlaylist)
+playlistRouter.route("/r/:videoId/p/:playlistId").patch(removeVideoFromPlaylist)
+playlistRouter.route("/d/:playlistId").delete(deletePlaylist)
 playlistRouter.route("/update-playlist/:playlistId").patch(updatePlaylist)
 export { playlistRouter };

@@ -13,7 +13,7 @@ const playlistSchema = new mongoose.Schema({
     trim: true,
     maxlength: 500
   },
-  user: {
+  owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true
