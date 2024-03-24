@@ -28,6 +28,9 @@ import { commentRouter } from './routes/comment.routes.js';
 import { likeRouter } from './routes/like.routes.js';
 import { dashoardRouter } from './routes/dashboard.routes.js';
 import { subscriptionRouter } from './routes/subscription.routes.js';
+import { healthcheck } from './controllers/healthcheck.controller.js';
+
+
 app.use('/api/v1/users', router);
 
 app.use("/api/v1/playlist", playlistRouter);
@@ -43,6 +46,8 @@ app.use("/api/v1/like", likeRouter);
 app.use("/api/v1/dashboard", dashoardRouter);
 
 app.use("/api/v1/subscription", subscriptionRouter);
+
+app.get('/api/v1/healthcheck', healthcheck);
 
 
 

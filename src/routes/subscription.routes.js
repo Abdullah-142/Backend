@@ -13,4 +13,8 @@ subscriptionRouter.use(verifyJWT);
 
 subscriptionRouter.route("/toggle/:channelId").post(toggleSubscription);
 
+subscriptionRouter.route("/s/:channelId").get(getUserChannelSubscribers);
+
+subscriptionRouter.route("/subscribed").get(getSubscribedChannels);
+
 export { subscriptionRouter };
