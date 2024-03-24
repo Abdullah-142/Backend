@@ -7,6 +7,8 @@ import {
   getLikedVideos
 }
   from "../controllers/like.controller.js";
+
+  
 const likeRouter = Router();
 
 
@@ -18,6 +20,6 @@ likeRouter.route("/toggle/c/:commentId").post(toggleCommentLike);
 
 likeRouter.route("/delete/:commentId").delete(toggleVideoLike);
 
-likeRouter.route("/update/:commentId").patch(getLikedVideos);
+likeRouter.route("/likedvideo").get(getLikedVideos);
 
 export { likeRouter };

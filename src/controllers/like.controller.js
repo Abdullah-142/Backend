@@ -30,12 +30,12 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
 
 const toggleCommentLike = asyncHandler(async (req, res) => {
   const { commentId } = req.params
-  
+
   if (!isValidObjectId(commentId)) {
     throw new ApiError(400, "Invalid comment id")
   }
 
-  const like = await Like.findOne({ comment: commentId, likedby: req.user._id })    
+  const like = await Like.findOne({ comment: commentId, likedby: req.user._id })
 
   if (like) {
     await Like.findByIdAndDelete(like._id)
@@ -55,7 +55,7 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
 
 const toggleTweetLike = asyncHandler(async (req, res) => {
   const { tweetId } = req.params
- if (!isValidObjectId(tweetId)) {
+  if (!isValidObjectId(tweetId)) {
     throw new ApiError(400, "Invalid tweet id")
   }
 
@@ -78,6 +78,43 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
 
 const getLikedVideos = asyncHandler(async (req, res) => {
   //TODO: get all liked videos
+
+  const likedVideos = await Like.aggregate([
+    {
+      $match: {
+        likedby: req.user._id,
+      }
+    },
+    {
+      $lookup: {
+        from: "videos",
+        localField: "video",
+        foreignField: "_id",
+        as: "likedVideos"
+      }
+    },
+    {
+      $addFields: {
+        likedVideos: {
+          $first: "$likedVideos"
+        }
+      }
+    },
+    {
+      $project: {
+        likedVideos: {
+          _id: 1,
+          title: 1,
+        }
+      },
+    }
+  ])
+
+  if (!likedVideos) {
+    throw new ApiError(404, "No liked videos found")
+  }
+
+  res.status(200).json(new ApiResponse(200, likedVideos, "Liked videos retrieved successfully"))
 })
 
 export {

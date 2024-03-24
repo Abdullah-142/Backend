@@ -20,13 +20,14 @@ app.use(express.urlencoded({
 app.use(express.static('public'));
 app.use(cookieParser());
 
-import { playlistRouter } from './routes/playlist.route.js';
-import { router } from './routes/user.route.js';
-import { videoRouter } from './routes/video.route.js';
-import { tweetRouter } from './routes/tweet.route.js';
-import { commentRouter } from './routes/comment.route.js';
-import { likeRouter } from './routes/like.route.js';
-
+import { playlistRouter } from './routes/playlist.routes.js';
+import { router } from './routes/user.routes.js';
+import { videoRouter } from './routes/video.routes.js';
+import { tweetRouter } from './routes/tweet.routes.js';
+import { commentRouter } from './routes/comment.routes.js';
+import { likeRouter } from './routes/like.routes.js';
+import { dashoardRouter } from './routes/dashboard.routes.js';
+import { subscriptionRouter } from './routes/subscription.routes.js';
 app.use('/api/v1/users', router);
 
 app.use("/api/v1/playlist", playlistRouter);
@@ -38,6 +39,10 @@ app.use("/api/v1/tweets", tweetRouter);
 app.use("/api/v1/comment", commentRouter);
 
 app.use("/api/v1/like", likeRouter);
+
+app.use("/api/v1/dashboard", dashoardRouter);
+
+app.use("/api/v1/subscription", subscriptionRouter);
 
 
 
