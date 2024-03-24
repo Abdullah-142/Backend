@@ -32,10 +32,20 @@ This project aims to develop a backend system similar to YouTube and Twitter, en
 
 ---
 
-<div align="center">
+<div align="left">
   <h2>Screenshots</h2>
 </br>
-  <img src="https://github.com/Abdullah-dev0/Backend/assets/116773738/0e55a005-4229-47fc-88f1-c1921298bb6f" alt="Screenshot" width="500">
+
+
+ ![image](https://github.com/Abdullah-dev0/Backend/assets/116773738/f8e8aed7-4774-4d7e-b9ef-824b93199a3e)
+
+
+
+
+  
+
+  ![image](https://github.com/Abdullah-dev0/Backend/assets/116773738/6ec88f6f-fe58-40be-a9bf-99db32876470)
+
 </div>
 
 ---
