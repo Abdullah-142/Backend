@@ -79,7 +79,10 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
   }
 
   const addVideo = await Playlist.findByIdAndUpdate(playlistId, {
-    $push: { videos: videoId }
+    
+    $addToSet: {
+      videos: videoId, // $addToSet is useful for ensuring that elements within an array remain unique.
+    }
   }, {
     new: true
   })
