@@ -1,82 +1,120 @@
 
 import { User } from "../models/user.model.js"
 import { Video } from "../models/video.model.js"
+import { Like } from "../models/like.model.js"
+import { Playlist } from "../models/playlist.model.js"
+import { Comment } from "../models/comment.model.js"
 import { ApiError } from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/apiResponse.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
 import uploadOnCloudinary from "../utils/cloudinary.js"
 
+async function removeLikesCommentsPlaylistWatchHistoryForVideo(videoId) {
+  try {
+    // Delete all likes for the video
+    const LikeDelete = await Like.deleteMany({ video: videoId });
+
+    const getComments = await Comment.find({ video: videoId });
+
+    const commentIds = getComments.map(comment => comment._id);
+    // Delete likes for the comments
+    const commentLikeDelete = await Like.deleteMany({ comment: { $in: commentIds } });
+
+    // Delete all comments for the video
+    const deleteComment = await Comment.deleteMany({ video: videoId });
+
+
+    // Remove playlist entries for the video
+    const playlistDelete = await Playlist.updateMany({}, { $pull: { videos: videoId } });
+
+    await Promise.all([
+      LikeDelete,
+      commentLikeDelete,
+      deleteComment,
+      playlistDelete
+    ]);
+
+    // Return true if all operations succeed
+    return true;
+
+  } catch (error) {
+    console.error('Error deleting likes, comments, playlist entries, and watch history for video:', error);
+    throw error; // Re-throw the error for handling at a higher level if needed
+  }
+}
+
+
 
 const getAllVideos = asyncHandler(async (req, res) => {
-    const { page = 1, limit = 10, query, sortBy, sortType} = req.query;
+  const { page = 1, limit = 10, query, sortBy, sortType } = req.query;
 
-    const user = await User.find({
-        refreshToken: req.cookies.refreshToken,
-    });
+  const user = await User.find({
+    refreshToken: req.cookies.refreshToken,
+  });
 
-    const pageNumber = parseInt(page);
-    const limitOfComments = parseInt(limit);
+  const pageNumber = parseInt(page);
+  const limitOfComments = parseInt(limit);
 
-    if (!user) {
-        throw new ApiError(400, "User is required.");
-    }
+  if (!user) {
+    throw new ApiError(400, "User is required.");
+  }
 
-    const skip = (pageNumber - 1) * limitOfComments;
-    const pageSize = limitOfComments;
+  const skip = (pageNumber - 1) * limitOfComments;
+  const pageSize = limitOfComments;
 
-    const videos = await Video.aggregatePaginate(
-        Video.aggregate([
-            { 
-                $match: {
-                    $or: [
-                        { title: { $regex: query, $options: 'i' } },
-                        { description: { $regex: query, $options: 'i' } }
-                    ],
-                    isPublished: true,
-                    owner: user._id
-                }
-            },
-            {
-                $lookup: {
-                    from: "likes",
-                    localField: "_id",
-                    foreignField: "video",
-                    as: "likes",
-                }
-            },
-            {
-                $addFields: {
-                    likes: { $size: "$likes" }
-                }
-            },
-            {
-                $project: {
-                    "_id": 1,
-                    "videoFile": 1,
-                    "thumbnail": 1,
-                    "title": 1,
-                    "description": 1,
-                    "duration": 1,
-                    "views": 1,
-                    "isPublished": 1,
-                    "owner": 1,
-                    "createdAt": 1,
-                    "updatedAt": 1,
-                    "likes": 1
-                }
-            },
-            { $sort: { [sortBy]: sortType === 'asc' ? 1 : -1 } },
-            { $skip: skip },
-            { $limit: pageSize }
-        ])
-    );
+  const videos = await Video.aggregatePaginate(
+    Video.aggregate([
+      {
+        $match: {
+          $or: [
+            { title: { $regex: query, $options: 'i' } },
+            { description: { $regex: query, $options: 'i' } }
+          ],
+          isPublished: true,
+          owner: user._id
+        }
+      },
+      {
+        $lookup: {
+          from: "likes",
+          localField: "_id",
+          foreignField: "video",
+          as: "likes",
+        }
+      },
+      {
+        $addFields: {
+          likes: { $size: "$likes" }
+        }
+      },
+      {
+        $project: {
+          "_id": 1,
+          "videoFile": 1,
+          "thumbnail": 1,
+          "title": 1,
+          "description": 1,
+          "duration": 1,
+          "views": 1,
+          "isPublished": 1,
+          "owner": 1,
+          "createdAt": 1,
+          "updatedAt": 1,
+          "likes": 1
+        }
+      },
+      { $sort: { [sortBy]: sortType === 'asc' ? 1 : -1 } },
+      { $skip: skip },
+      { $limit: pageSize }
+    ])
+  );
 
-    if (videos.length === 0) {
-        return res.status(200).json(new ApiResponse(400, "No videos available."));
-    }
+  if (videos.length === 0) {
+    return res.status(200).json(new ApiResponse(400, "No videos available."));
+  }
 
-    // Return the videos
-    res.status(200).json(new ApiResponse(200, videos, "Videos fetched successfully"));
+  // Return the videos
+  res.status(200).json(new ApiResponse(200, videos, "Videos fetched successfully"));
 });
 
 const publishAVideo = asyncHandler(async (req, res) => {
@@ -260,24 +298,28 @@ const deleteVideo = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Video ID is required")
   }
 
-  const user = await User.findById(_id)
-
-  if (!user) {
-    throw new ApiError(404, "User not found")
-  }
-  const video = await Video.findByIdAndDelete(videoId)
+  const video = await Video.findById(videoId)
 
   if (!video) {
     throw new ApiError(404, "Video not found")
   }
 
-  if (!user._id.toString() === video.owner.toString()) {
+
+  if (!video.owner.toString() === _id.toString()) {
     throw new ApiError(401, "only owner can delete the video")
   }
 
+  const deletelikes = await removeLikesCommentsPlaylistWatchHistoryForVideo(videoId);
 
-  if (!video) {
-    throw new ApiError(404, "Video not found")
+  if (!deletelikes) {
+    throw new ApiError(400, "Failed to delete likes and comments for video")
+  }
+
+  const deleteVideo = await Video.findByIdAndDelete(videoId)
+
+
+  if (!deleteVideo) {
+    throw new ApiError(400, "Failed to delete video")
   }
 
   res.status(200).json(
