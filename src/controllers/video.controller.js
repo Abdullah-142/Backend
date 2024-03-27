@@ -142,13 +142,13 @@ const publishAVideo = asyncHandler(async (req, res) => {
   if (!videoUrl || !thumbnailUrl) {
     throw new ApiError(500, "Failed to upload video or thumbnail")
   }
-
+  console.log(videoUrl);
   const video = await Video.create({
     title,
     description,
     videoFile: videoUrl?.url,
     thumbnail: thumbnailUrl?.url,
-    duration: videoUrl?.duration,
+    duration: Math.floor(videoUrl?.duration) + ' s',
     owner: req.user._id
   });
 
