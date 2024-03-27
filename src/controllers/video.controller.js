@@ -8,6 +8,7 @@ import { ApiError } from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/apiResponse.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
 import uploadOnCloudinary from "../utils/cloudinary.js"
+import { videoSchema } from "../validation/index.js"
 
 async function removeLikesCommentsPlaylistWatchHistoryForVideo(videoId) {
   try {
@@ -119,8 +120,11 @@ const getAllVideos = asyncHandler(async (req, res) => {
 const publishAVideo = asyncHandler(async (req, res) => {
   const { title, description } = req.body
 
-  if (!title.trim() || !description.trim()) {
-    throw new ApiError(400, "Title and description is required")
+  const { error } = videoSchema.safeParse({title, description})
+
+
+  if (error) {
+    throw new ApiError(400, error.message)
   }
 
   const videoFilPath = req.files.videoFile[0].path

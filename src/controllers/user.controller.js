@@ -4,6 +4,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import uploadOnCloudinary from "../utils/cloudinary.js";
+import { registerAndLoginSchema } from "../validation/index.js";
 
 
 // Generate access and refresh tokens
@@ -30,12 +31,14 @@ const generateAccessAndRefereshTokens = async (userid) => {
 
 // Reister handler
 
-const registerHandler = asyncHandler(async (req, res, next) => {
+const registerHandler = asyncHandler(async (req, res) => {
   const { fullname, email, password, username } = req.body;
 
-  if ([username, email, password, fullname].some((key) => key?.trim() === "")) {
-    throw new ApiError(400, 'All fields are required');
+  const { error } = registerAndLoginSchema.safeParse({ fullname, email, password, username });
+  if (error) {
+    throw new ApiError(400, error);
   }
+
   const existingUser = await User.findOne({
     $or: [{ email }, { username }],
   })
@@ -93,9 +96,10 @@ const loginHandler = asyncHandler(async (req, res) => {
 
   const { email, username, password } = req.body
 
-  if (!(username || email)) {
-    throw new ApiError(400, "username or email is required")
+  const { error } = registerAndLoginSchema.safeParse({ email, username, password });
 
+  if (error) {
+    throw new ApiError(400, error);
   }
 
   const user = await User.findOne({
@@ -502,3 +506,4 @@ export {
   refreshTokenHandler, registerHandler, updateAvatar,
   updateCoverImage, updatepasswordHanlder, updateUserProfile
 };
+
