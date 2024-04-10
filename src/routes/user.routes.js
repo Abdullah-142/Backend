@@ -14,10 +14,10 @@ import {
 } from '../controllers/user.controller.js';
 import { verifyJWT } from '../middlewares/auth.middleware.js';
 import { upload } from '../middlewares/multer.middleware.js';
-const router = Router();
+const userRouter = Router();
 
 
-router.route('/register').post(upload.fields([
+userRouter.route('/register').post(upload.fields([
   {
     name: 'avatar',
     maxCount: 1,
@@ -28,21 +28,22 @@ router.route('/register').post(upload.fields([
   }
 ]), registerHandler);
 
-router.route('/login').post(loginHandler);
+userRouter.route('/login').post(loginHandler);
 // secured routes
 
-router.route('/logout').post(verifyJWT, logoutHandler);
-router.route('/refresh-token').post(refreshTokenHandler);
-router.route('/get-current-user').get(verifyJWT, getCurrentUser);
-router.route('/update-password').post(verifyJWT, updatepasswordHanlder);
-router.route('/update-profile').patch(verifyJWT, updateUserProfile);
-router.route('/update-avatar').patch(verifyJWT, upload.single('avatar'), updateAvatar);
-router.route('/update-background-image').patch(verifyJWT, upload.single('backgroundImage'), updateCoverImage);
-router.route('/u/:username').get(verifyJWT, getUserProfile);
-router.route('/u/:id/watch-history').get(verifyJWT, getUserWatchHistory);
+userRouter.route('/logout').post(verifyJWT, logoutHandler);
+userRouter.route('/refresh-token').post(refreshTokenHandler);
+userRouter.route('/get-current-user').get(verifyJWT, getCurrentUser);
+userRouter.route('/update-password').post(verifyJWT, updatepasswordHanlder);
+userRouter.route('/update-profile').patch(verifyJWT, updateUserProfile);
+userRouter.route('/update-avatar').patch(verifyJWT, upload.single('avatar'), updateAvatar);
+userRouter.route('/update-background-image').patch(verifyJWT, upload.single('backgroundImage'), updateCoverImage);
+userRouter.route('/u/:username').get(verifyJWT, getUserProfile);
+userRouter.route('/u/:id/watch-history').get(verifyJWT, getUserWatchHistory);
 
 
 // user model is done
 
 
-export { router };
+export { userRouter };
+
